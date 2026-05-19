@@ -118,7 +118,7 @@ python manage.py seed_demo
 Build Pack: Dockerfile
 Base Directory: frontend
 Dockerfile: Dockerfile
-Port: 80
+Port: 81
 Domain: https://mtex.example.com
 ```
 
@@ -147,7 +147,7 @@ http://backend:8001
 Build Pack: Dockerfile
 Base Directory: admin-frontend
 Dockerfile: Dockerfile
-Port: 80
+Port: 82
 Domain: https://admin.mtex.example.com
 ```
 
@@ -166,7 +166,7 @@ BACKEND_URL=http://backend:8001
 
 Это не значит, что backend занимает порт сервера, где работает сам Coolify. Coolify/Traefik проксирует трафик внутрь контейнера. Конфликт будет только если вручную публиковать host port, а здесь это не нужно.
 
-Фронты слушают порт `80` внутри своих контейнеров. Снаружи Coolify сам выдает HTTPS-домены.
+Client frontend слушает порт `81` внутри контейнера, admin frontend слушает порт `82`. Снаружи Coolify сам выдает HTTPS-домены.
 
 ## Почему не писать Docker IP во frontend
 
