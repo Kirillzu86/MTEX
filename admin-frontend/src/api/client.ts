@@ -1,6 +1,6 @@
 import type { Category, CustomerRequest, LoginResponse, Product } from "../types/catalog";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000/api";
+const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 const TOKEN_KEY = "mtex_admin_token";
 
 export function getToken() {

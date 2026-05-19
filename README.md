@@ -1,12 +1,21 @@
 # MTEX Furniture Store
 
-Проект мебельного магазина:
+Проект состоит из трех отдельных ресурсов для Coolify:
 
-- `frontend/` - клиентский сайт на React + TypeScript + Vite.
-- `admin-frontend/` - отдельный админский сайт на React + TypeScript + Vite.
-- `backend/` - Django API, SQLite БД, Django admin и API для каталога/заявок.
+- `backend/` - Django API, SQLite, Django admin.
+- `frontend/` - клиентский сайт на React + Vite.
+- `admin-frontend/` - админский сайт на React + Vite.
 
-## Локальный запуск без Docker
+Backend не обязан иметь отдельный публичный домен. Правильная схема для этого проекта:
+
+```text
+browser -> frontend domain -> nginx /api -> backend inside Coolify network
+browser -> admin domain    -> nginx /api -> backend inside Coolify network
+```
+
+То есть браузер видит только домены фронтов, а backend доступен фронтам по внутреннему адресу Coolify.
+
+## Локальный запуск
 
 Backend:
 
@@ -21,7 +30,7 @@ python manage.py seed_demo
 python manage.py runserver
 ```
 
-Клиентский сайт:
+Frontend:
 
 ```bash
 cd frontend
@@ -29,7 +38,7 @@ npm install
 npm run dev
 ```
 
-Админский сайт:
+Admin frontend:
 
 ```bash
 cd admin-frontend
@@ -39,45 +48,36 @@ npm run dev
 
 Локальные адреса:
 
-- клиентский сайт: `http://127.0.0.1:5173/`
-- админский сайт: `http://127.0.0.1:5174/`
-- Django API: `http://127.0.0.1:8000/api/`
-- Django admin: `http://127.0.0.1:8000/admin/`
+- frontend: `http://127.0.0.1:5173/`
+- admin frontend: `http://127.0.0.1:5174/`
+- backend: `http://127.0.0.1:8001/`
 
-## Деплой в Coolify отдельными ресурсами
+В dev-режиме Vite проксирует `/api` и `/media` на `http://127.0.0.1:8001`.
 
-Деплоим 3 отдельных ресурса, каждый из своей папки:
+## Coolify: Backend
 
-- `backend` - Dockerfile: `backend/Dockerfile`, порт `8000`.
-- `frontend` - Dockerfile: `frontend/Dockerfile`, порт `80`.
-- `admin-frontend` - Dockerfile: `admin-frontend/Dockerfile`, порт `80`.
-
-Пример доменов:
-
-- `https://mtex.example.com` - клиентский сайт.
-- `https://admin.mtex.example.com` - админский сайт.
-- `https://api.mtex.example.com` - backend/API/Django admin.
-
-### 1. Backend ресурс
-
-В Coolify создайте новый ресурс из репозитория.
+Создайте первый ресурс из репозитория.
 
 Настройки:
 
-- Build Pack: `Dockerfile`
-- Base Directory / Root Directory: `backend`
-- Dockerfile: `Dockerfile`
-- Port: `8000`
-- Domain: `https://api.mtex.example.com`
+```text
+Build Pack: Dockerfile
+Base Directory: backend
+Dockerfile: Dockerfile
+Port: 8001
+Public Domain: не обязательно
+```
+
+Если Django admin через `/admin/` публично не нужен, домен backend можно не выдавать.
 
 Environment Variables:
 
 ```env
 DJANGO_DEBUG=False
 DJANGO_SECRET_KEY=replace-with-long-random-secret
-DJANGO_ALLOWED_HOSTS=api.mtex.example.com
-DJANGO_CORS_ALLOWED_ORIGINS=https://mtex.example.com,https://admin.mtex.example.com
-DJANGO_CSRF_TRUSTED_ORIGINS=https://api.mtex.example.com
+DJANGO_ALLOWED_HOSTS=mtex.example.com,admin.mtex.example.com
+DJANGO_CORS_ALLOWED_ORIGINS=
+DJANGO_CSRF_TRUSTED_ORIGINS=https://mtex.example.com,https://admin.mtex.example.com
 DJANGO_DB_PATH=/data/db.sqlite3
 DJANGO_MEDIA_ROOT=/data/media
 DJANGO_SERVE_MEDIA=True
@@ -88,86 +88,95 @@ DJANGO_SESSION_COOKIE_SECURE=True
 DJANGO_CSRF_COOKIE_SECURE=True
 ```
 
-Добавьте Persistent Storage / Volume:
+Важно: так как фронтовые nginx проксируют backend с заголовком `Host` от своего домена, в `DJANGO_ALLOWED_HOSTS` нужно добавить домены фронтов.
+
+Добавьте persistent storage:
 
 ```text
 /data
 ```
 
-Это нужно, чтобы SQLite база и загруженные медиафайлы не пропадали после redeploy.
-
-После первого деплоя откройте терминал backend-контейнера и создайте администратора:
+После первого деплоя в терминале backend-контейнера:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Опционально можно заполнить демо-данные:
+Опционально:
 
 ```bash
 python manage.py seed_demo
 ```
 
-### 2. Frontend ресурс
+## Coolify: Frontend
 
 Создайте второй ресурс из того же репозитория.
 
 Настройки:
 
-- Build Pack: `Dockerfile`
-- Base Directory / Root Directory: `frontend`
-- Dockerfile: `Dockerfile`
-- Port: `80`
-- Domain: `https://mtex.example.com`
-
-Build Arguments или Environment Variables на этапе сборки:
-
-```env
-VITE_API_URL=https://api.mtex.example.com/api
+```text
+Build Pack: Dockerfile
+Base Directory: frontend
+Dockerfile: Dockerfile
+Port: 80
+Domain: https://mtex.example.com
 ```
 
-Важно: `VITE_API_URL` встраивается во фронтенд во время сборки. Если поменяли API-домен, пересоберите frontend.
+Environment Variables:
 
-### 3. Admin Frontend ресурс
+```env
+VITE_API_URL=/api
+BACKEND_URL=http://backend:8001
+```
+
+`BACKEND_URL` должен быть внутренним адресом backend-ресурса в сети Coolify.
+
+Если ресурс backend в Coolify называется не `backend`, возьмите внутренний URL из настроек Coolify и подставьте его вместо:
+
+```text
+http://backend:8001
+```
+
+## Coolify: Admin Frontend
 
 Создайте третий ресурс из того же репозитория.
 
 Настройки:
 
-- Build Pack: `Dockerfile`
-- Base Directory / Root Directory: `admin-frontend`
-- Dockerfile: `Dockerfile`
-- Port: `80`
-- Domain: `https://admin.mtex.example.com`
+```text
+Build Pack: Dockerfile
+Base Directory: admin-frontend
+Dockerfile: Dockerfile
+Port: 80
+Domain: https://admin.mtex.example.com
+```
 
-Build Arguments или Environment Variables на этапе сборки:
+Environment Variables:
 
 ```env
-VITE_API_URL=https://api.mtex.example.com/api
+VITE_API_URL=/api
+BACKEND_URL=http://backend:8001
 ```
 
 Для входа используйте Django superuser или staff-пользователя.
 
-## Что делает backend-контейнер
+## Что с портами
 
-При старте backend автоматически выполняет:
+`Port: 8001` у backend в Coolify - это порт внутри контейнера, на котором слушает Gunicorn.
 
-```bash
-python manage.py migrate --noinput
-python manage.py collectstatic --noinput
+Это не значит, что backend занимает порт сервера, где работает сам Coolify. Coolify/Traefik проксирует трафик внутрь контейнера. Конфликт будет только если вручную публиковать host port, а здесь это не нужно.
+
+Фронты слушают порт `80` внутри своих контейнеров. Снаружи Coolify сам выдает HTTPS-домены.
+
+## Почему не писать Docker IP во frontend
+
+React-код работает в браузере пользователя. Браузер не находится внутри Docker-сети Coolify и не сможет открыть `http://backend:8001` или внутренний Docker IP.
+
+Поэтому схема такая:
+
+```text
+React fetch('/api/categories/')
+-> nginx frontend контейнера
+-> proxy_pass BACKEND_URL
+-> Django backend
 ```
-
-После этого запускается:
-
-```bash
-gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
-```
-
-## Docker-файлы
-
-- `backend/Dockerfile` - Django + Gunicorn.
-- `frontend/Dockerfile` - Vite build + nginx.
-- `admin-frontend/Dockerfile` - Vite build + nginx.
-
-Каждый Dockerfile рассчитан на сборку из своей папки, поэтому в Coolify обязательно указывайте правильный Base Directory.
-
