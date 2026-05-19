@@ -8,6 +8,8 @@
   --color-red-dark: #a90f16;
   --color-red-soft: #fff1f1;
   --color-graphite: #2b2d31;
+  --content-width: 1180px;
+  --page-x: clamp(18px, 5vw, 64px);
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--color-ink);
@@ -27,6 +29,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: hidden;
 }
 
 button,
@@ -57,7 +60,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 16px clamp(18px, 5vw, 64px);
+  padding: 16px max(var(--page-x), calc((100vw - var(--content-width)) / 2));
   border-bottom: 1px solid var(--color-line);
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
@@ -67,6 +70,7 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .brand-mark {
@@ -83,6 +87,10 @@ a {
 .brand strong,
 .brand small {
   display: block;
+}
+
+.brand strong {
+  line-height: 1.12;
 }
 
 .brand small {
@@ -122,7 +130,8 @@ a {
   display: flex;
   min-height: 620px;
   align-items: flex-end;
-  padding: clamp(90px, 12vw, 150px) clamp(18px, 5vw, 64px) clamp(42px, 8vw, 86px);
+  justify-content: center;
+  padding: clamp(90px, 12vw, 150px) var(--page-x) clamp(42px, 8vw, 86px);
   background:
     linear-gradient(90deg, rgba(22, 22, 24, 0.78) 0%, rgba(80, 18, 22, 0.5) 50%, rgba(215, 25, 32, 0.16) 100%),
     url("https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=2200&q=85") center/cover;
@@ -130,7 +139,7 @@ a {
 }
 
 .hero-content {
-  max-width: 760px;
+  width: min(100%, var(--content-width));
 }
 
 .eyebrow {
@@ -157,14 +166,14 @@ p {
 h1 {
   max-width: 760px;
   margin-bottom: 18px;
-  font-size: clamp(44px, 7vw, 78px);
+  font-size: clamp(38px, 6vw, 78px);
   line-height: 0.98;
   letter-spacing: 0;
 }
 
 h2 {
   margin-bottom: 12px;
-  font-size: clamp(30px, 4vw, 48px);
+  font-size: clamp(28px, 3.6vw, 48px);
   line-height: 1.05;
   letter-spacing: 0;
 }
@@ -228,7 +237,9 @@ p {
 }
 
 .section {
-  padding: clamp(52px, 8vw, 92px) clamp(18px, 5vw, 64px);
+  width: min(100%, calc(var(--content-width) + var(--page-x) * 2));
+  margin: 0 auto;
+  padding: clamp(52px, 8vw, 92px) var(--page-x);
 }
 
 .section-heading,
@@ -303,11 +314,14 @@ p {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
   gap: 20px;
 }
 
 .product-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--color-line);
   border-radius: 8px;
@@ -336,6 +350,9 @@ p {
 }
 
 .product-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 18px;
 }
 
@@ -348,7 +365,7 @@ p {
 }
 
 .product-card-body p {
-  min-height: 80px;
+  flex: 1;
 }
 
 .product-card-footer {
@@ -361,13 +378,22 @@ p {
 }
 
 .product-card-footer strong,
+.modal-price,
+.text-button,
+.primary-button,
+.secondary-button {
+  white-space: nowrap;
+}
+
+.product-card-footer strong,
 .modal-price {
   color: var(--color-red-dark);
   font-size: 22px;
 }
 
 .info-band {
-  margin: 0 clamp(18px, 5vw, 64px);
+  width: min(calc(100% - var(--page-x) * 2), var(--content-width));
+  margin: 0 auto;
   padding: clamp(34px, 6vw, 56px) 0;
   border-top: 1px solid var(--color-line);
   border-bottom: 1px solid var(--color-line);
@@ -460,6 +486,7 @@ p {
 
 .modal-content {
   padding: 34px;
+  min-width: 0;
 }
 
 .modal-price {
@@ -471,7 +498,7 @@ p {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 28px clamp(18px, 5vw, 64px);
+  padding: 28px max(var(--page-x), calc((100vw - var(--content-width)) / 2));
   border-top: 1px solid var(--color-line);
   color: var(--color-muted);
 }
@@ -484,15 +511,20 @@ p {
   .nav {
     position: absolute;
     top: 100%;
-    right: 18px;
-    left: 18px;
+    right: var(--page-x);
+    left: var(--page-x);
     display: none;
     flex-direction: column;
     align-items: stretch;
     border: 1px solid var(--color-line);
     border-radius: 8px;
     background: var(--color-surface);
+    box-shadow: 0 18px 40px rgba(32, 33, 36, 0.14);
     padding: 14px;
+  }
+
+  .nav a {
+    padding: 8px 4px;
   }
 
   .nav-open {
@@ -516,23 +548,113 @@ p {
   }
 
   .modal-media {
-    min-height: 320px;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
   }
 }
 
 @media (max-width: 560px) {
+  :root {
+    --page-x: 16px;
+  }
+
   .site-header {
-    padding: 12px 14px;
+    gap: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+  }
+
+  .brand strong {
+    max-width: 210px;
+    font-size: 15px;
   }
 
   .brand small {
     display: none;
   }
 
+  .icon-button {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+  }
+
   .hero {
-    min-height: 520px;
-    padding-right: 18px;
-    padding-left: 18px;
+    min-height: 500px;
+    align-items: flex-end;
+    padding-top: 72px;
+    padding-bottom: 38px;
+    background-position: 58% center;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+  }
+
+  h1 {
+    font-size: clamp(34px, 11vw, 46px);
+    line-height: 1;
+  }
+
+  h2 {
+    font-size: clamp(25px, 8vw, 34px);
+    line-height: 1.08;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
+
+  .hero p {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 22px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .catalog-tools {
+    gap: 12px;
+    margin: 22px 0;
+  }
+
+  .category-filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+  }
+
+  .category-filter svg,
+  .category-filter button {
+    flex: 0 0 auto;
+  }
+
+  .product-grid {
+    gap: 16px;
+  }
+
+  .product-card-body {
+    padding: 16px;
   }
 
   .product-card-footer,
@@ -542,6 +664,35 @@ p {
   }
 
   .modal-content {
-    padding: 22px;
+    padding: 22px 18px;
+  }
+
+  .modal-backdrop {
+    align-items: start;
+    padding: 10px;
+  }
+
+  .product-modal {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+  }
+
+  .request-form {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand strong {
+    max-width: 170px;
+  }
+
+  .hero {
+    min-height: 470px;
+  }
+
+  .product-card-footer strong,
+  .modal-price {
+    font-size: 20px;
   }
 }
