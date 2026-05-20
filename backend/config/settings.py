@@ -10,12 +10,41 @@ def env_bool(name: str, default: bool = False) -> bool:
 
 
 def env_list(name: str, default: str = "") -> list[str]:
-    return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
+    raw_value = os.getenv(name, default).replace("\n", ",")
+    return [item.strip() for item in raw_value.split(",") if item.strip()]
+
+
+def unique_list(items: list[str]) -> list[str]:
+    result = []
+    for item in items:
+        if item and item not in result:
+            result.append(item)
+    return result
+
+
+DEFAULT_ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".cloudpub.ru",
+    "positively-moving-springbuck.cloudpub.ru",
+]
+
+DEFAULT_CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "https://positively-moving-springbuck.cloudpub.ru",
+    "https://uniformly-simple-lanternfish.cloudpub.ru",
+    "https://timidly-ethical-diver.cloudpub.ru",
+    "https://honestly-nifty-jellyfish.cloudpub.ru",
+    "https://tiredly-nourishing-pademelon.cloudpub.ru",
+]
 
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", True)
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = unique_list(DEFAULT_ALLOWED_HOSTS + env_list("DJANGO_ALLOWED_HOSTS"))
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -93,11 +122,11 @@ MEDIA_ROOT = Path(os.getenv("DJANGO_MEDIA_ROOT", str(BASE_DIR / "media")))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CORS_ALLOWED_ORIGINS = env_list(
-    "DJANGO_CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174",
-)
-CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
+CORS_ALLOWED_ORIGINS = unique_list(DEFAULT_CORS_ALLOWED_ORIGINS + env_list("DJANGO_CORS_ALLOWED_ORIGINS"))
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.cloudpub\.ru$",
+]
+CSRF_TRUSTED_ORIGINS = unique_list(DEFAULT_CORS_ALLOWED_ORIGINS + env_list("DJANGO_CSRF_TRUSTED_ORIGINS"))
 SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", True)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

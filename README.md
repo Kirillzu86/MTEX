@@ -75,9 +75,9 @@ Environment Variables:
 ```env
 DJANGO_DEBUG=False
 DJANGO_SECRET_KEY=replace-with-long-random-secret
-DJANGO_ALLOWED_HOSTS=mtex.example.com,admin.mtex.example.com
-DJANGO_CORS_ALLOWED_ORIGINS=
-DJANGO_CSRF_TRUSTED_ORIGINS=https://mtex.example.com,https://admin.mtex.example.com
+DJANGO_ALLOWED_HOSTS=positively-moving-springbuck.cloudpub.ru
+DJANGO_CORS_ALLOWED_ORIGINS=https://uniformly-simple-lanternfish.cloudpub.ru,https://timidly-ethical-diver.cloudpub.ru,https://honestly-nifty-jellyfish.cloudpub.ru,https://tiredly-nourishing-pademelon.cloudpub.ru
+DJANGO_CSRF_TRUSTED_ORIGINS=https://positively-moving-springbuck.cloudpub.ru,https://uniformly-simple-lanternfish.cloudpub.ru,https://timidly-ethical-diver.cloudpub.ru,https://honestly-nifty-jellyfish.cloudpub.ru,https://tiredly-nourishing-pademelon.cloudpub.ru
 DJANGO_DB_PATH=/data/db.sqlite3
 DJANGO_MEDIA_ROOT=/data/media
 DJANGO_SERVE_MEDIA=True
@@ -125,7 +125,7 @@ Domain: https://mtex.example.com
 Environment Variables:
 
 ```env
-VITE_API_URL=/api
+VITE_API_URL=https://positively-moving-springbuck.cloudpub.ru/api
 BACKEND_URL=http://backend:8001
 ```
 
@@ -154,7 +154,7 @@ Domain: https://admin.mtex.example.com
 Environment Variables:
 
 ```env
-VITE_API_URL=/api
+VITE_API_URL=https://positively-moving-springbuck.cloudpub.ru/api
 BACKEND_URL=http://backend:8001
 ```
 
