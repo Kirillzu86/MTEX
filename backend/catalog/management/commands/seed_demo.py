@@ -6,13 +6,15 @@ from catalog.models import Category, Product
 
 
 class Command(BaseCommand):
-    help = "Create demo categories and products for local development."
+    help = "Create demo furniture hardware categories and products for local development."
 
     def handle(self, *args, **options):
         categories = [
-            ("Кухни", "kitchens", "Кухонные гарнитуры на заказ"),
-            ("Шкафы", "wardrobes", "Шкафы-купе и гардеробные"),
-            ("Гостиные", "living-rooms", "ТВ-зоны и системы хранения"),
+            ("Мебельные ручки", "handles", "Ручки, кнопки и профили для фасадов"),
+            ("Петли и механизмы", "hinges", "Петли, доводчики и подъемники"),
+            ("Направляющие", "slides", "Шариковые и скрытые направляющие"),
+            ("Опоры и ножки", "legs", "Опоры для шкафов, кухонь и столов"),
+            ("Крепеж", "fasteners", "Конфирматы, стяжки, уголки и заглушки"),
         ]
 
         category_map = {}
@@ -30,27 +32,43 @@ class Command(BaseCommand):
 
         products = [
             {
-                "category": category_map["kitchens"],
-                "name": "Кухня City Line",
-                "slug": "city-line",
-                "description": "Современная кухня с матовыми фасадами, встроенной техникой и продуманным хранением.",
-                "price": Decimal("590000.00"),
+                "category": category_map["handles"],
+                "name": "Ручка профильная Line 160 мм",
+                "slug": "line-handle-160",
+                "description": "Алюминиевая профильная ручка для кухонных фасадов и шкафов.",
+                "price": Decimal("1450.00"),
                 "is_featured": True,
             },
             {
-                "category": category_map["wardrobes"],
-                "name": "Шкаф Alto",
-                "slug": "alto",
-                "description": "Встроенный шкаф с раздвижными дверями, подсветкой и индивидуальным наполнением.",
-                "price": Decimal("320000.00"),
+                "category": category_map["hinges"],
+                "name": "Петля с доводчиком SoftClose",
+                "slug": "softclose-hinge",
+                "description": "Петля 110 градусов с плавным закрыванием для корпусной мебели.",
+                "price": Decimal("980.00"),
                 "is_featured": True,
             },
             {
-                "category": category_map["living-rooms"],
-                "name": "Гостиная Forma",
-                "slug": "forma",
-                "description": "Лаконичная мебельная композиция для гостиной с закрытыми и открытыми секциями.",
-                "price": Decimal("410000.00"),
+                "category": category_map["slides"],
+                "name": "Направляющие полного выдвижения 450 мм",
+                "slug": "full-extension-slide-450",
+                "description": "Шариковые направляющие для ящиков с высокой нагрузкой.",
+                "price": Decimal("2650.00"),
+                "is_featured": True,
+            },
+            {
+                "category": category_map["legs"],
+                "name": "Опора регулируемая кухонная 100 мм",
+                "slug": "kitchen-leg-100",
+                "description": "Пластиковая регулируемая опора для кухонных модулей.",
+                "price": Decimal("320.00"),
+                "is_featured": False,
+            },
+            {
+                "category": category_map["fasteners"],
+                "name": "Комплект конфирматов 7x50",
+                "slug": "confirmat-pack",
+                "description": "Крепеж для сборки корпусной мебели, упаковка 100 шт.",
+                "price": Decimal("1800.00"),
                 "is_featured": False,
             },
         ]
@@ -58,4 +76,9 @@ class Command(BaseCommand):
         for product in products:
             Product.objects.update_or_create(slug=product["slug"], defaults=product)
 
-        self.stdout.write(self.style.SUCCESS("Demo catalog created."))
+        active_category_slugs = [slug for _, slug, _ in categories]
+        active_product_slugs = [product["slug"] for product in products]
+        Category.objects.exclude(slug__in=active_category_slugs).update(is_active=False)
+        Product.objects.exclude(slug__in=active_product_slugs).update(is_active=False)
+
+        self.stdout.write(self.style.SUCCESS("Demo hardware catalog created."))

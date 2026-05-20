@@ -46,14 +46,19 @@ export function RequestForm({ product }: RequestFormProps) {
       </label>
       <label>
         Комментарий
-        <textarea value={comment} onChange={(event) => setComment(event.target.value)} rows={4} />
+        <textarea
+          value={comment}
+          onChange={(event) => setComment(event.target.value)}
+          placeholder={product ? `Интересует: ${product.name}` : "Что подобрать или рассчитать?"}
+          rows={4}
+        />
       </label>
       <button className="primary-button" type="submit" disabled={status === "loading"}>
         <Send size={18} />
         {status === "loading" ? "Отправляем" : "Оставить заявку"}
       </button>
       {status === "success" && <p className="form-status success">Заявка отправлена. Мы свяжемся с вами.</p>}
-      {status === "error" && <p className="form-status error">Не удалось отправить заявку. Проверьте сервер API.</p>}
+      {status === "error" && <p className="form-status error">Не удалось отправить заявку. Проверьте backend.</p>}
     </form>
   );
 }

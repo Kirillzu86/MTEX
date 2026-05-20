@@ -9,7 +9,7 @@ type ProductModalProps = {
 };
 
 const fallbackImage =
-  "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80";
+  "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&w=1200&q=82";
 
 export function ProductModal({ product, onClose }: ProductModalProps) {
   if (!product) {
@@ -30,7 +30,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
         <div className="modal-content">
           <span className="category-label">{product.category.name}</span>
           <h2>{product.name}</h2>
-          <strong className="modal-price">{Number(product.price).toLocaleString("ru-RU")} ₸</strong>
+          <strong className="modal-price">{Number(product.price).toLocaleString("ru-RU")} тенге/шт</strong>
           <p>{product.description || "Подробное описание товара можно добавить через административную панель."}</p>
           <RequestForm product={product} />
         </div>
